@@ -2,13 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Space Defender</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Performance optimizations -->
+    <link rel="preload" href="{{ url_for('static', filename='style.css') }}" as="style">
+    <link rel="preload" href="{{ url_for('static', filename='game.js') }}" as="script">
+    
+    <!-- DNS prefetch for external resources if any -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    
+    <!-- Critical CSS inline for faster rendering -->
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden}
+        #gameCanvas{border:2px solid #333;background:#001122;display:block;max-width:100vw;max-height:100vh}
+        #score{position:absolute;top:20px;left:20px;color:#00ff00;font-size:20px;font-weight:bold;z-index:10}
+    </style>
+    
+    <!-- Load non-critical CSS asynchronously -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></noscript>
 </head>
 <body>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
     <div id="score">Score: 0</div>
-    <script src="{{ url_for('static', filename='game.js') }}"></script>
+    
+    <!-- Load JavaScript with defer for better performance -->
+    <script defer src="{{ url_for('static', filename='game.js') }}"></script>
+    
+    <!-- Service Worker for caching (optional) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>
